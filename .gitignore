@@ -1,0 +1,5 @@
+build/
+__pycache__/
+# per-packet traces are large; regenerate them with scripts/run_matrix.sh
+results/*/trace.csv
+results/*/ready

@@ -1,0 +1,2 @@
+stage,count,mean_ns,min_ns,p50_ns,p90_ns,p99_ns,p99.9_ns,p99.99_ns,max_ns,negative
+sender_lateness,496526,24614.3,28,847,23679,536575,2310143,3932159,4970851,0

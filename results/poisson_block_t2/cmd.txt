@@ -1,0 +1,2 @@
+gen:  --arrivals poisson --rate 50000 --duration 10 --seed 2
+recv: --mode block --trace-every 1 --trace-max 200000

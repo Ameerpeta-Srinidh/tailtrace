@@ -1,0 +1,1 @@
+tt_recv[busy]: 499685 packets, 499685 msgs, lost 0, late 0, dup 0, kernel drops 0 | from_schedule p50 2719 ns, p99 618495 ns, p99.9 3899391 ns, max 11823294 ns

@@ -1,0 +1,2 @@
+gen:  --arrivals hawkes --rate 50000 --duration 10 --seed 1
+recv: --mode busy --trace-every 1 --trace-max 200000

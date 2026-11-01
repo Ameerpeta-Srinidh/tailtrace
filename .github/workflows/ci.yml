@@ -1,0 +1,39 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build-test-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Python deps
+        run: pip install -r requirements.txt
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DTT_NATIVE=OFF
+      - name: Build
+        run: cmake --build build -j
+      - name: Unit tests
+        run: ctest --test-dir build --output-on-failure
+      - name: Smoke run in network namespaces (2 s, with injected faults)
+        run: |
+          sudo scripts/testbed.sh up
+          sudo GEN_CPU=0 RECV_CPU=1 scripts/run_experiment.sh smoke \
+            --gen "--arrivals hawkes --rate 20000 --duration 2 --loss 0.001 --dup 0.001 --reorder 0.001" \
+            --recv "--mode busy --trace-every 1"
+          python3 - <<'PY'
+          import csv
+          g = dict(csv.reader(open("results/smoke/gen_stats.csv")))
+          r = dict(csv.reader(open("results/smoke/recv_stats.csv")))
+          assert int(r["packets"]) > 0, r
+          assert r["seq_lost"] == g["injected_loss"], (r, g)
+          assert r["seq_duplicates"] == g["injected_dup"], (r, g)
+          print("smoke OK: every injected fault was detected")
+          PY
+          sudo chown -R "$USER" results
+          python3 analysis/report.py results/smoke --out results/smoke_report
+      - uses: actions/upload-artifact@v4
+        with:
+          name: smoke-results
+          path: results/
